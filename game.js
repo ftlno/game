@@ -17,10 +17,10 @@ function init() {
     document.body.appendChild(renderer.domElement);
 }
 
-function getMesh() {
+function getMesh(meshColor) {
     var geometry = new THREE.BoxGeometry(10, 10, 10);
     var material = new Physijs.createMaterial(new THREE.MeshBasicMaterial({
-        color: 0xff0000,
+        color: meshColor,
         wireframe: true
     }), 0.9, 0.9);
 
@@ -30,7 +30,7 @@ function getMesh() {
 
 function addPlayer() {
 
-    player = getMesh();
+    player = getMesh(0xff0000);
     player.position.y = 200;
     scene.add(player);
 
