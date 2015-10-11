@@ -32,7 +32,6 @@ function addMesh() {
 }
 
 function addEnvironment() {
-    // Ground
     var ground_material = new Physijs.createMaterial(new THREE.MeshBasicMaterial({
         color: 0xffff00,
         wireframe: true
@@ -41,7 +40,7 @@ function addEnvironment() {
     ground = new Physijs.BoxMesh(
         new THREE.BoxGeometry(1000, 1, 1000),
         ground_material,
-        0 // mass
+        0
     );
     scene.add(ground);
 }
