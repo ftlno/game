@@ -29,11 +29,9 @@ function getMesh(meshColor) {
 }
 
 function addPlayer() {
-
     player = getMesh(0xff0000);
     player.position.y = 200;
     scene.add(player);
-
 }
 
 function addEnvironment() {
@@ -62,10 +60,10 @@ function keyboardEvents() {
 }
 
 function animate() {
+    keyboardEvents();
     scene.simulate();
     renderer.render(scene, camera);
     requestAnimationFrame(animate);
-    keyboardEvents();
 }
 
 function startGame() {
