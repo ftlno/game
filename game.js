@@ -1,6 +1,4 @@
-var scene, camera, renderer;
-var geometry, material, mesh;
-var keyboard;
+var scene, camera, renderer, player, keyboard;
 
 Physijs.scripts.worker = '/js/physijs_worker.js';
 Physijs.scripts.ammo = '/js/ammo.js';
@@ -19,16 +17,23 @@ function init() {
     document.body.appendChild(renderer.domElement);
 }
 
-function addMesh() {
-    geometry = new THREE.BoxGeometry(10, 10, 10);
-    material = new Physijs.createMaterial(new THREE.MeshBasicMaterial({
+function getMesh() {
+    var geometry = new THREE.BoxGeometry(10, 10, 10);
+    var material = new Physijs.createMaterial(new THREE.MeshBasicMaterial({
         color: 0xff0000,
         wireframe: true
     }), 0.9, 0.9);
 
-    mesh = new Physijs.BoxMesh(geometry, material);
-    mesh.position.y = 200;
-    scene.add(mesh);
+    var mesh = new Physijs.BoxMesh(geometry, material);
+    return mesh;
+}
+
+function addPlayer() {
+
+    player = getMesh();
+    player.position.y = 200;
+    scene.add(player);
+
 }
 
 function addEnvironment() {
@@ -36,8 +41,7 @@ function addEnvironment() {
         color: 0xffff00,
         wireframe: true
     }), 0.8, 0.3);
-
-    ground = new Physijs.BoxMesh(
+    var ground = new Physijs.BoxMesh(
         new THREE.BoxGeometry(1000, 1, 1000),
         ground_material,
         0
@@ -47,13 +51,13 @@ function addEnvironment() {
 
 function keyboardEvents() {
     if (keyboard.pressed("left")) {
-        mesh.applyCentralImpulse(new THREE.Vector3(-4000, 0, 0));
+        player.applyCentralImpulse(new THREE.Vector3(-4000, 2000, 0));
     }
     if (keyboard.pressed("right")) {
-        mesh.applyCentralImpulse(new THREE.Vector3(4000, 0, 0));
+        player.applyCentralImpulse(new THREE.Vector3(4000, 2000, 0));
     }
     if (keyboard.pressed("up")) {
-        mesh.applyCentralImpulse(new THREE.Vector3(0, 8000, 0));
+        player.applyCentralImpulse(new THREE.Vector3(0, 8000, 0));
     }
 }
 
@@ -67,6 +71,6 @@ function animate() {
 function startGame() {
     init();
     addEnvironment();
-    addMesh();
+    addPlayer();
     animate();
 }
