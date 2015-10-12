@@ -15,7 +15,7 @@ var players = [];
 
 wss.on('connection', function(ws) {
     ws.playerID = idCounter++;
-    ws.pos = {
+    ws.position = {
         x: 0,
         y: 0,
         z: 0
@@ -31,9 +31,11 @@ wss.on('connection', function(ws) {
     players.push(ws);
 
     ws.on('message', function(message) {
-        var msg = JSON.parse(message);
-        if (msg.type === 'position') {
-            ws.position = msg.position;
+        if (message !== 'undefined') {
+            var msg = JSON.parse(message);
+            if (msg.type === 'position') {
+                ws.position = msg.position;
+            }
         }
     });
 
@@ -57,7 +59,7 @@ var sendPositions = function() {
     var positions = JSON.stringify(getPlayerPositions());
     for (var i = 0; i < players.length; i++) {
         players[i].send(JSON.stringify({
-            "type": "pos",
+            "type": "position",
             "position": positions
         }));
     }
@@ -69,9 +71,9 @@ var getPlayerPositions = function() {
         playerPositions.push({
             playerID: players[i].playerID,
             position: {
-                x: players[i].pos.x,
-                y: players[i].pos.y,
-                z: players[i].pos.z
+                x: players[i].position.x,
+                y: players[i].position.y,
+                z: players[i].position.z
             }
         });
     }

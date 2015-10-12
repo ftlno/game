@@ -35,13 +35,15 @@ function setupWebSocket() {
         startPositionUpdates();
     };
     ws.onmessage = function(event) {
-        var msg = JSON.parse(event.data);
-        if (msg.type === 'ready') {
-            playerID = msg.playerID;
-        } else if (msg.type === 'pos') {
-            handlePositionUpdates(msg.pos);
-        } else if (msg.type === 'newPlayer') {
-            newRemotePlayer(msg.playerID);
+        if (event.data !== 'undefined') {
+            var msg = JSON.parse(event.data);
+            if (msg.type === 'ready') {
+                playerID = msg.playerID;
+            } else if (msg.type === 'position') {
+                handlePositionUpdates(msg.position);
+            } else if (msg.type === 'newPlayer') {
+                newRemotePlayer(msg.playerID);
+            }
         }
     };
 }
@@ -93,7 +95,7 @@ function addEnvironment() {
 
     ground_geometry.computeFaceNormals();
     ground_geometry.computeVertexNormals();
-    ground = new Physijs.HeightfieldMesh(ground_geometry, ground_material, 0,20,20);
+    ground = new Physijs.HeightfieldMesh(ground_geometry, ground_material, 0, 20, 20);
     ground.rotation.x = Math.PI / -2;
     ground.receiveShadow = true;
     scene.add(ground);
@@ -121,7 +123,7 @@ function unknown(remotePlayerID) {
         return false;
     }
     for (var i = 0; i < localPlayers.length; i++) {
-        if (localPlayers[i].playerID === remotePlayerID) {
+        if (localPlayers[i].playerID == remotePlayerID) {
             return false;
         }
     }
