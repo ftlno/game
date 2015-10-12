@@ -89,7 +89,7 @@ function updatePlayers() {
 function newRemotePlayer(playerID) {
     var newPlayer = getMesh(0x00ff00);
     newPlayer.name = "" + playerID;
-    players.push("" + playerID);
+    players.push(playerID);
     scene.add(newPlayer);
 }
 
