@@ -6,27 +6,44 @@ var app = express();
 var port = 8000;
 
 app.use('/', express.static(__dirname + '/'));
-//app.listen(8000);
 
 var idCounter = 0;
 
 var players = [ ];
 
 wss.on('connection', function(ws) {
-	console.log("NEW WS CONNECTION!");
 	ws.playerID = idCounter++;
 	ws.pos = {
 		x: 0,
 		y: 0,
 		z: 0
 	};
+	
+	for (var i = 0; i < players.length; i++) {
+		players[i].send(JSON.stringify({
+			"type": "newPlayer",
+			"id": ws.playerID
+		}));
+	}
+	
 	players.push(ws);
+	
 	ws.on('message', function(message) {
 		var msg = JSON.parse(message);
-		if (msg.type === 'position') {
+		if (msg.type === 'pos') {
 			ws.pos = msg.pos;
 		}
 	});
+	
+	ws.on('close', function(reason) {
+		for (var i = 0; i < players.length; i++) {
+			if (players[i] === ws) {
+				players.splice(i, 1);
+				break;
+			}
+		}
+	});
+	
 	ws.send(JSON.stringify({
 		"type": "ready",
 		"id": ws.playerID
@@ -37,7 +54,10 @@ wss.on('connection', function(ws) {
 var sendPositions = function() {
 	var positions = JSON.stringify(getPlayerPositions());
 	for (var i = 0; i < players.length; i++) {
-		players[i].send(positions);
+		players[i].send(JSON.stringify({
+			"type": "pos",
+			"pos": positions
+		}));
 	}
 };
 
