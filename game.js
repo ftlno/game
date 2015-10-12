@@ -14,7 +14,7 @@ function init() {
     keyboard = new THREEx.KeyboardState();
     scene = new Physijs.Scene;
     scene.setGravity(new THREE.Vector3(0, -230, 0));
-    camera = new THREE.PerspectiveCamera(55, (window.innerWidth / window.innerHeight), 0.1, 10000);
+    camera = new THREE.PerspectiveCamera(45, (window.innerWidth / window.innerHeight), 0.1, 10000);
     camera.position.set(0, 100, 150);
 
     renderer = new THREE.WebGLRenderer({
@@ -52,7 +52,8 @@ function handlePositionUpdates(positions) {
 
 function addLight() {
     var light = new THREE.DirectionalLight(0xF5F5F5, 1);
-    light.position.set(200, 200, 100);
+    light.position.set(200, 300, 100);
+    light.castShadow = true;
     scene.add(light);
 
     var ambLight = new THREE.AmbientLight(0x0505050);
@@ -79,41 +80,46 @@ function addPlayer() {
 
 function addEnvironment() {
     var ground_material = new Physijs.createMaterial(new THREE.MeshPhongMaterial({
-        color: 0xEDEDED
+        color: 0x919191
     }), 0.8, 0.3);
 
     var NoiseGen = new SimplexNoise;
 
-    var ground_geometry = new THREE.PlaneGeometry(300, 300, 200, 200);
+    var ground_geometry = new THREE.PlaneGeometry(300, 300, 20, 20);
     for (var i = 0; i < ground_geometry.vertices.length; i++) {
         var vertex = ground_geometry.vertices[i];
-        vertex.z = NoiseGen.noise(vertex.x / 15, vertex.y / 20) * 2;
+        vertex.z = NoiseGen.noise(vertex.x / 50, vertex.y / 50) * 10;
     }
 
     ground_geometry.computeFaceNormals();
     ground_geometry.computeVertexNormals();
-    ground = new Physijs.HeightfieldMesh(ground_geometry, ground_material, 0, 200, 200);
+    ground = new Physijs.HeightfieldMesh(ground_geometry, ground_material, 0,20,20);
     ground.rotation.x = Math.PI / -2;
     ground.receiveShadow = true;
     scene.add(ground);
 }
 
 function updatePlayers() {
-    for (var i = 0; i < remotePlayers.length; i++) {
-        var remotePlayerID = remotePlayers[i].playerID;
-        if (unknown(remotePlayerID)) {
-            newRemotePlayer(remotePlayerID);
-        } else if (remotePlayerID !== playerID) {
-            var newPlayer = scene.getObjectByName(remotePlayerID + "");
-            newPlayer.position.setX(remotePlayers[i].position.x);
-            newPlayer.position.setY(remotePlayers[i].position.y);
-            newPlayer.position.setZ(remotePlayers[i].position.z);
+    if (playerID !== -1) {
+        for (var i = 0; i < remotePlayers.length; i++) {
+            var remotePlayerID = remotePlayers[i].playerID;
+            if (unknown(remotePlayerID)) {
+                newRemotePlayer(remotePlayerID);
+            } else if (remotePlayerID !== playerID) {
+                var newPlayer = scene.getObjectByName(remotePlayerID + "");
+                newPlayer.position.setX(remotePlayers[i].position.x);
+                newPlayer.position.setY(remotePlayers[i].position.y);
+                newPlayer.position.setZ(remotePlayers[i].position.z);
+            }
         }
     }
     localPlayers = remotePlayers.slice(0);
 }
 
 function unknown(remotePlayerID) {
+    if (localPlayers.length > 1) {
+        return false;
+    }
     for (var i = 0; i < localPlayers.length; i++) {
         if (localPlayers[i].playerID === remotePlayerID) {
             return false;
@@ -151,10 +157,10 @@ function keyboardEvents() {
 
 function animate() {
     keyboardEvents();
+    updatePlayers();
     scene.simulate();
     camera.lookAt(player.position);
     renderer.render(scene, camera);
-    updatePlayers();
     requestAnimationFrame(animate);
 }
 
@@ -169,12 +175,12 @@ function startGame() {
 function startPositionUpdates() {
     setInterval(function() {
         ws.send(JSON.stringify({
-            "type": "pos",
-            "pos": {
+            "type": "position",
+            "position": {
                 x: player.position.x,
                 y: player.position.y,
                 z: player.position.z
             }
         }));
-    }, 10);
+    }, 20);
 }

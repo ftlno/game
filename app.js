@@ -17,7 +17,7 @@ wss.on('connection', function(ws) {
     ws.playerID = idCounter++;
     ws.pos = {
         x: 0,
-        y: 100,
+        y: 0,
         z: 0
     };
 
@@ -32,8 +32,8 @@ wss.on('connection', function(ws) {
 
     ws.on('message', function(message) {
         var msg = JSON.parse(message);
-        if (msg.type === 'pos') {
-            ws.pos = msg.pos;
+        if (msg.type === 'position') {
+            ws.position = msg.position;
         }
     });
 
@@ -58,7 +58,7 @@ var sendPositions = function() {
     for (var i = 0; i < players.length; i++) {
         players[i].send(JSON.stringify({
             "type": "pos",
-            "pos": positions
+            "position": positions
         }));
     }
 };
