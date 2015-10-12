@@ -1,4 +1,7 @@
 var scene, camera, renderer, player, keyboard;
+var players = [];
+var counter = 0;
+var remotePlayers = [];
 
 Physijs.scripts.worker = '/js/physijs_worker.js';
 Physijs.scripts.ammo = '/js/ammo.js';
@@ -7,8 +10,8 @@ function init() {
     keyboard = new THREEx.KeyboardState();
     scene = new Physijs.Scene;
     scene.setGravity(new THREE.Vector3(0, -230, 0));
-    camera = new THREE.PerspectiveCamera(70, (window.innerWidth / window.innerHeight), 1, 10000);
-    camera.position.set(0, 50, 150);
+    camera = new THREE.PerspectiveCamera(55, (window.innerWidth / window.innerHeight), 0.1, 10000);
+    camera.position.set(0, 100, 150);
 
     renderer = new THREE.WebGLRenderer({
         antialias: true
@@ -69,6 +72,27 @@ function addEnvironment() {
     scene.add(ground);
 }
 
+function updatePlayers() {
+    for (var i = 0; i < remotePlayers.length; i++) {
+        for (var j = 0; j < players.length; j++) {
+            if (remotePlayers[i].playerID == players[j]) {
+                var newPlayer = scene.getObjectByName("" + players[j]);
+                newPlayer.position = new THREE.Vector3();
+                newPlayer.position.setX(remotePlayers[i].position.x);
+                newPlayer.position.setY(remotePlayers[i].position.y);
+                newPlayer.position.setZ(remotePlayers[i].position.z);
+            }
+        }
+    }
+}
+
+function newRemotePlayer(playerID) {
+    var newPlayer = getMesh(0x00ff00);
+    newPlayer.name = "" + playerID;
+    players.push("" + playerID);
+    scene.add(newPlayer);
+}
+
 function keyboardEvents() {
     if (keyboard.pressed("left")) {
         player.applyCentralImpulse(new THREE.Vector3(-200, 200, 0));
@@ -90,7 +114,35 @@ function keyboardEvents() {
     }
 }
 
+function mockMovePlayers() {
+    for (var i = 0; i < remotePlayers.length; i++) {
+        var move = Math.random();
+        remotePlayers[i].position.x += Math.random() > 0.5 ? move : -move;
+        remotePlayers[i].position.y += Math.random() > 0.5 ? move : -move;
+    }
+}
+
+function mockPlayers() {
+    for (var i = 0; i < 2; i++) {
+        var id = Math.round(Math.random() * 100000);
+        newRemotePlayer(id);
+        var x = Math.floor(Math.random() * 50);
+        var y = Math.floor(Math.random() * 50) + 50;
+        var z = Math.floor(Math.random() * 50);
+        remotePlayers.push({
+            playerID: id,
+            position: {
+                x: Math.random() > 0.5 ? x : -x,
+                y: y,
+                z: Math.random() > 0.5 ? z : -z
+            }
+        });
+    }
+}
+
 function animate() {
+    updatePlayers();
+    mockMovePlayers();
     keyboardEvents();
     scene.simulate();
     camera.lookAt(player.position);
@@ -103,5 +155,6 @@ function startGame() {
     addLight();
     addEnvironment();
     addPlayer();
+    mockPlayers();
     animate();
 }
