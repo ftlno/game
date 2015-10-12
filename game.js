@@ -71,14 +71,21 @@ function addEnvironment() {
 
 function keyboardEvents() {
     if (keyboard.pressed("left")) {
-        player.applyCentralImpulse(new THREE.Vector3(-250, 250, 0));
-        player.rotation.z += 0.5;
+        player.applyCentralImpulse(new THREE.Vector3(-200, 200, 0));
     }
     if (keyboard.pressed("right")) {
-        player.applyCentralImpulse(new THREE.Vector3(250, 250, 0));
-        player.rotation.z -= 0.5;
+        player.applyCentralImpulse(new THREE.Vector3(200, 200, 0));
     }
+
     if (keyboard.pressed("up")) {
+        player.applyCentralImpulse(new THREE.Vector3(0, 200, -200));
+    }
+
+    if (keyboard.pressed("down")) {
+        player.applyCentralImpulse(new THREE.Vector3(0, 200, 200));
+    }
+
+    if (keyboard.pressed("space")) {
         player.applyCentralImpulse(new THREE.Vector3(0, 750, 0));
     }
 }
@@ -87,7 +94,6 @@ function animate() {
     keyboardEvents();
     scene.simulate();
     camera.lookAt(player.position);
-
     renderer.render(scene, camera);
     requestAnimationFrame(animate);
 }
