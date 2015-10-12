@@ -17,7 +17,7 @@ wss.on('connection', function(ws) {
     ws.playerID = idCounter++;
     ws.pos = {
         x: 0,
-        y: 0,
+        y: 100,
         z: 0
     };
 

@@ -28,7 +28,7 @@ function init() {
 }
 
 function setupWebSocket() {
-    ws = new WebSocket('ws://10.0.20.9:8000');
+    ws = new WebSocket('ws://localhost:8000');
 
     ws.onopen = function(event) {
         console.log("WebSocket connection open");
@@ -54,7 +54,6 @@ function handlePositionUpdates(positions) {
 function addLight() {
     var light = new THREE.DirectionalLight(0xF5F5F5, 1);
     light.position.set(200, 200, 100);
-    light.castShadow = true;
     scene.add(light);
 
     var ambLight = new THREE.AmbientLight(0x0505050);
@@ -115,7 +114,7 @@ function updatePlayers() {
 }
 
 function newRemotePlayer(playerID) {
-    var newPlayer = getMesh(0x00ff00);
+    var newPlayer = getMesh(0x28BCB3);
     newPlayer.name = "" + playerID;
     players.push(playerID);
     scene.add(newPlayer);
