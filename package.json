@@ -1,12 +1,13 @@
 {
-    "name": "game",
-    "version": "1.0.0",
-    "description": "",
-    "main": "app.js",
-    "dependencies": {
-        "express": "4.13.3"
-    },
-    "scripts": {
-        "start": "node app.js"
-    }
+  "name": "game",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "express": "4.13.3",
+    "ws": "^0.8.0"
+  },
+  "scripts": {
+    "start": "node app.js"
+  }
 }
