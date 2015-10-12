@@ -21,13 +21,6 @@ wss.on('connection', function(ws) {
         z: 0
     };
 
-    for (var i = 0; i < players.length; i++) {
-        players[i].send(JSON.stringify({
-            "type": "newPlayer",
-            "playerID": ws.playerID
-        }));
-    }
-
     players.push(ws);
 
     ws.on('message', function(message) {

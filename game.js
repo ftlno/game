@@ -41,8 +41,6 @@ function setupWebSocket() {
                 playerID = msg.playerID;
             } else if (msg.type === 'position') {
                 handlePositionUpdates(msg.position);
-            } else if (msg.type === 'newPlayer') {
-                newRemotePlayer(msg.playerID);
             }
         }
     };
@@ -159,7 +157,6 @@ function keyboardEvents() {
 
 function render() {
     updatePlayers();
-
     camera.lookAt(player.position);
     renderer.render(scene, camera);
     requestAnimationFrame(render);
