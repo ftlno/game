@@ -157,13 +157,18 @@ function keyboardEvents() {
     }
 }
 
-function animate() {
-    keyboardEvents();
+function render() {
     updatePlayers();
-    scene.simulate();
+
     camera.lookAt(player.position);
     renderer.render(scene, camera);
-    requestAnimationFrame(animate);
+    requestAnimationFrame(render);
+}
+
+function loop() {
+    keyboardEvents();
+    scene.simulate();
+    setTimeout(loop, 1000 / 60);
 }
 
 function startGame() {
@@ -171,7 +176,8 @@ function startGame() {
     addLight();
     addEnvironment();
     addPlayer();
-    animate();
+    render();
+    loop();
 }
 
 function startPositionUpdates() {
