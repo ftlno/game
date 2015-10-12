@@ -22,7 +22,7 @@ function init() {
     });
     renderer.setClearColor(new THREE.Color(0xDBDBDB));
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.shadowMapEnabled = true;
+    renderer.shadowMap.enabled = true;
     renderer.shadowMapSoft = true;
     document.body.appendChild(renderer.domElement);
 }
@@ -72,8 +72,9 @@ function getMesh(meshColor) {
     return mesh;
 }
 
-function addPlayer() {
+function initPlayer() {
     player = getMesh(0xDF565B);
+    player.position.y = 50;
     player.position.y = 50;
     scene.add(player);
 }
@@ -102,10 +103,11 @@ function addEnvironment() {
 function updatePlayers() {
     if (playerID !== -1) {
         for (var i = 0; i < remotePlayers.length; i++) {
+
             var remotePlayerID = remotePlayers[i].playerID;
             if (unknown(remotePlayerID)) {
                 newRemotePlayer(remotePlayerID);
-            } else if (remotePlayerID !== playerID) {
+            } else if (remotePlayerID != playerID) {
                 var newPlayer = scene.getObjectByName(remotePlayerID + "");
                 newPlayer.position.setX(remotePlayers[i].position.x);
                 newPlayer.position.setY(remotePlayers[i].position.y);
@@ -172,7 +174,7 @@ function startGame() {
     init();
     addLight();
     addEnvironment();
-    addPlayer();
+    initPlayer();
     render();
     loop();
 }
