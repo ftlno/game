@@ -48,7 +48,7 @@ wss.on('connection', function(ws) {
 
     ws.send(JSON.stringify({
         "type": "ready",
-        "id": ws.playerID
+        "playerID": ws.playerID
     }));
 });
 
@@ -67,8 +67,8 @@ var getPlayerPositions = function() {
     var playerPositions = [];
     for (var i = 0; i < players.length; i++) {
         playerPositions.push({
-            id: players[i].playerID,
-            pos: {
+            playerID: players[i].playerID,
+            position: {
                 x: players[i].pos.x,
                 y: players[i].pos.y,
                 z: players[i].pos.z
@@ -80,9 +80,9 @@ var getPlayerPositions = function() {
 
 setInterval(function() {
     sendPositions();
-}, 100);
+}, 10);
 
 server.on('request', app);
 server.listen(port, function() {
-    console.log('Listening on ' + server.address().port)
+    console.log('Listening on ' + server.address().port);
 });

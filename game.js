@@ -1,9 +1,9 @@
 var ws;
 var playerID = -1;
 var scene, camera, renderer, player, keyboard;
-var players = [];
-var counter = 0;
 var remotePlayers = [];
+var localPlayers = [];
+var counter = 0;
 
 Physijs.scripts.worker = '/js/physijs_worker.js';
 Physijs.scripts.ammo = '/js/ammo.js';
@@ -37,8 +37,7 @@ function setupWebSocket() {
     ws.onmessage = function(event) {
         var msg = JSON.parse(event.data);
         if (msg.type === 'ready') {
-            console.log("My id is " + msg.id);
-            playerID = msg.id;
+            playerID = msg.playerID;
         } else if (msg.type === 'pos') {
             handlePositionUpdates(msg.pos);
         } else if (msg.type === 'newPlayer') {
@@ -48,7 +47,7 @@ function setupWebSocket() {
 }
 
 function handlePositionUpdates(positions) {
-    remotePlayers = positions;
+    remotePlayers = JSON.parse(positions);
 }
 
 function addLight() {
@@ -101,22 +100,31 @@ function addEnvironment() {
 
 function updatePlayers() {
     for (var i = 0; i < remotePlayers.length; i++) {
-        for (var j = 0; j < players.length; j++) {
-            if (remotePlayers[i].playerID == players[j]) {
-                var newPlayer = scene.getObjectByName("" + players[j]);
-                newPlayer.position = new THREE.Vector3();
-                newPlayer.position.setX(remotePlayers[i].position.x);
-                newPlayer.position.setY(remotePlayers[i].position.y);
-                newPlayer.position.setZ(remotePlayers[i].position.z);
-            }
+        var remotePlayerID = remotePlayers[i].playerID;
+        if (unknown(remotePlayerID)) {
+            newRemotePlayer(remotePlayerID);
+        } else if (remotePlayerID !== playerID) {
+            var newPlayer = scene.getObjectByName(remotePlayerID + "");
+            newPlayer.position.setX(remotePlayers[i].position.x);
+            newPlayer.position.setY(remotePlayers[i].position.y);
+            newPlayer.position.setZ(remotePlayers[i].position.z);
         }
     }
+    localPlayers = remotePlayers.slice(0);
 }
 
-function newRemotePlayer(playerID) {
+function unknown(remotePlayerID) {
+    for (var i = 0; i < localPlayers.length; i++) {
+        if (localPlayers[i].playerID === remotePlayerID) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function newRemotePlayer(remotePlayerID) {
     var newPlayer = getMesh(0x28BCB3);
-    newPlayer.name = "" + playerID;
-    players.push(playerID);
+    newPlayer.name = "" + remotePlayerID;
     scene.add(newPlayer);
 }
 
@@ -142,11 +150,11 @@ function keyboardEvents() {
 }
 
 function animate() {
-    updatePlayers();
     keyboardEvents();
     scene.simulate();
     camera.lookAt(player.position);
     renderer.render(scene, camera);
+    updatePlayers();
     requestAnimationFrame(animate);
 }
 
@@ -168,5 +176,5 @@ function startPositionUpdates() {
                 z: player.position.z
             }
         }));
-    }, 50);
+    }, 10);
 }
