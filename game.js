@@ -142,32 +142,6 @@ function keyboardEvents() {
     }
 }
 
-function mockMovePlayers() {
-    for (var i = 0; i < remotePlayers.length; i++) {
-        var move = Math.random();
-        remotePlayers[i].position.x += Math.random() > 0.5 ? move : -move;
-        remotePlayers[i].position.y += Math.random() > 0.5 ? move : -move;
-    }
-}
-
-function mockPlayers() {
-    for (var i = 0; i < 2; i++) {
-        var id = Math.round(Math.random() * 100000);
-        newRemotePlayer(id);
-        var x = Math.floor(Math.random() * 50);
-        var y = Math.floor(Math.random() * 50) + 50;
-        var z = Math.floor(Math.random() * 50);
-        remotePlayers.push({
-            playerID: id,
-            position: {
-                x: Math.random() > 0.5 ? x : -x,
-                y: y,
-                z: Math.random() > 0.5 ? z : -z
-            }
-        });
-    }
-}
-
 function animate() {
     updatePlayers();
     keyboardEvents();
