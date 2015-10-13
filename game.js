@@ -40,7 +40,6 @@ function setupWebSocket() {
             } else if (msg.type === 'position') {
                 handlePositionUpdates(msg.position);
             } else if (msg.type === 'remove') {
-                console.log('remove:' + msg.playerID);
                 deleteRemotePlayer(msg.playerID);
             }
         }
@@ -57,7 +56,7 @@ function updateServerPositions() {
                 z: player.position.z
             }
         }));
-    }, 20);
+    }, 30);
 }
 
 function handlePositionUpdates(positions) {
