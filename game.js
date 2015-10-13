@@ -15,7 +15,6 @@ function init() {
     scene.setGravity(new THREE.Vector3(0, -230, 0));
     camera = new THREE.PerspectiveCamera(45, (window.innerWidth / window.innerHeight), 0.1, 10000);
     camera.position.set(0, 100, 150);
-
     renderer = new THREE.WebGLRenderer();
     renderer.setClearColor(new THREE.Color(0xDBDBDB));
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -63,12 +62,11 @@ function handlePositionUpdates(positions) {
     remotePlayers = JSON.parse(positions);
 }
 
-function addLight() {
+function initLight() {
     var light = new THREE.DirectionalLight(0xF5F5F5, 1);
     light.position.set(0, 500, 100);
     light.castShadow = true;
     scene.add(light);
-
     var ambLight = new THREE.AmbientLight(0x0505050);
     scene.add(ambLight);
 }
@@ -81,7 +79,6 @@ function getMesh(meshColor) {
 
     var mesh = new Physijs.BoxMesh(geometry, material, 100);
     mesh.castShadow = true;
-
     return mesh;
 }
 
@@ -91,13 +88,12 @@ function initPlayer() {
     scene.add(player);
 }
 
-function addEnvironment() {
+function initEnvironment() {
     var material = new Physijs.createMaterial(new THREE.MeshPhongMaterial({
         color: 0x919191
     }), 0.8, 0.3);
 
     var NoiseGen = new SimplexNoise();
-
     var geometry = new THREE.PlaneGeometry(500, 500, 10, 10);
     var geometry_verticesLength = geometry.vertices.length;
     for (var i = 0; i < geometry_verticesLength; i++) {
@@ -163,6 +159,7 @@ function keyboardEvents() {
     if (keyboard.pressed("left")) {
         player.applyCentralImpulse(new THREE.Vector3(-200, 100, 0));
     }
+
     if (keyboard.pressed("right")) {
         player.applyCentralImpulse(new THREE.Vector3(200, 100, 0));
     }
@@ -178,8 +175,6 @@ function keyboardEvents() {
     if (keyboard.pressed("space")) {
         player.applyCentralImpulse(new THREE.Vector3(0, 600, 0));
     }
-    player.rotation.set = new THREE.Vector3(0, 0, 0);
-
 }
 
 function loop() {
@@ -197,8 +192,8 @@ function render() {
 
 function startGame() {
     init();
-    addLight();
-    addEnvironment();
+    initEnvironment();
+    initLight();
     initPlayer();
     render();
     loop();
