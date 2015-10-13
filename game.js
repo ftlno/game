@@ -80,22 +80,22 @@ function initPlayer() {
 }
 
 function addEnvironment() {
-    var ground_material = new Physijs.createMaterial(new THREE.MeshPhongMaterial({
+    var material = new Physijs.createMaterial(new THREE.MeshPhongMaterial({
         color: 0x919191
     }), 0.8, 0.3);
 
     var NoiseGen = new SimplexNoise();
 
-    var ground_geometry = new THREE.PlaneGeometry(500, 500, 10, 10);
-    var ground_geometry_verticesLength = ground_geometry.vertices.length;
-    for (var i = 0; i < ground_geometry_verticesLength; i++) {
-        var vertex = ground_geometry.vertices[i];
+    var geometry = new THREE.PlaneGeometry(500, 500, 10, 10);
+    var geometry_verticesLength = geometry.vertices.length;
+    for (var i = 0; i < geometry_verticesLength; i++) {
+        var vertex = geometry.vertices[i];
         vertex.z = NoiseGen.noise(vertex.x / 50, vertex.y / 50) * 5;
     }
 
-    ground_geometry.computeFaceNormals();
-    ground_geometry.computeVertexNormals();
-    ground = new Physijs.HeightfieldMesh(ground_geometry, ground_material, 0, 10, 10);
+    geometry.computeFaceNormals();
+    geometry.computeVertexNormals();
+    var ground = new Physijs.HeightfieldMesh(geometry, material, 0, 10, 10);
     ground.rotation.x = Math.PI / -2;
     ground.receiveShadow = true;
     scene.add(ground);
