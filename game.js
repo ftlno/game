@@ -106,16 +106,20 @@ function updatePlayers() {
         var remotePlayerID = remotePlayers[i].playerID;
         if (remotePlayerID !== playerID && playerID !== -1) {
             if (!knownPlayer(remotePlayerID)) {
-                newRemotePlayer(remotePlayerID);
+                showRemotePlayer(remotePlayerID);
             } else if (knownPlayer(remotePlayerID) && remotePlayerID !== playerID) {
-                var newPlayer = scene.getObjectByName(remotePlayerID + "");
-                newPlayer.position.setX(remotePlayers[i].position.x);
-                newPlayer.position.setY(remotePlayers[i].position.y);
-                newPlayer.position.setZ(remotePlayers[i].position.z);
+                updateRemotePlayer(remotePlayerID, remotePlayers[i].position);
             }
         }
     }
     localPlayers = remotePlayers.slice(0);
+}
+
+function updateRemotePlayer(remotePlayerID, remotePlayerPosition) {
+    var newPlayer = scene.getObjectByName(remotePlayerID + "");
+    newPlayer.position.setX(remotePlayerPosition.x);
+    newPlayer.position.setY(remotePlayerPosition.y);
+    newPlayer.position.setZ(remotePlayerPosition.z);
 }
 
 function knownPlayer(remotePlayerID) {
@@ -127,7 +131,7 @@ function knownPlayer(remotePlayerID) {
     return false;
 }
 
-function newRemotePlayer(remotePlayerID) {
+function showRemotePlayer(remotePlayerID) {
     var newPlayer = getMesh(0x28BCB3);
     newPlayer.name = "" + remotePlayerID;
     scene.add(newPlayer);
