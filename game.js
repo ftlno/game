@@ -16,9 +16,7 @@ function init() {
     camera = new THREE.PerspectiveCamera(45, (window.innerWidth / window.innerHeight), 0.1, 10000);
     camera.position.set(0, 100, 150);
 
-    renderer = new THREE.WebGLRenderer({
-        antialias: true
-    });
+    renderer = new THREE.WebGLRenderer();
     renderer.setClearColor(new THREE.Color(0xDBDBDB));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.shadowMap.enabled = true;
@@ -41,6 +39,9 @@ function setupWebSocket() {
                 localPlayers.push(playerID);
             } else if (msg.type === 'position') {
                 handlePositionUpdates(msg.position);
+            } else if (msg.type === 'remove') {
+                console.log('remove:' + msg.playerID);
+                deleteRemotePlayer(msg.playerID);
             }
         }
     };
@@ -79,7 +80,7 @@ function getMesh(meshColor) {
         color: meshColor
     }), 0.9, 0.9);
 
-    var mesh = new Physijs.BoxMesh(geometry, material);
+    var mesh = new Physijs.BoxMesh(geometry, material, 100);
     mesh.castShadow = true;
 
     return mesh;

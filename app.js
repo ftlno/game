@@ -6,11 +6,8 @@ var wss = new WebSocketServer({
 var express = require('express');
 var app = express();
 var port = 8000;
-
 app.use('/', express.static(__dirname + '/'));
-
 var idCounter = 0;
-
 var players = [];
 
 wss.on('connection', function(ws) {
@@ -36,6 +33,12 @@ wss.on('connection', function(ws) {
         for (var i = 0; i < players.length; i++) {
             if (players[i] === ws) {
                 players.splice(i, 1);
+                for (var j = 0; j < players.length; j++) {
+                    players[j].send(JSON.stringify({
+                        "type": "remove",
+                        "playerID": ws.playerID
+                    }));
+                }
                 break;
             }
         }
@@ -46,6 +49,12 @@ wss.on('connection', function(ws) {
         "playerID": ws.playerID
     }));
 });
+
+var removePlayer = function(playerID) {
+    for (var i = 0; i < players.length; i++) {
+
+    }
+}
 
 
 var sendPositions = function() {
