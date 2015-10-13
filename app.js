@@ -50,13 +50,6 @@ wss.on('connection', function(ws) {
     }));
 });
 
-var removePlayer = function(playerID) {
-    for (var i = 0; i < players.length; i++) {
-
-    }
-}
-
-
 var sendPositions = function() {
     var positions = JSON.stringify(getPlayerPositions());
     for (var i = 0; i < players.length; i++) {
