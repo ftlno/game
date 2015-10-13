@@ -1,9 +1,9 @@
-var ws;
-var playerID = -1;
 var scene, camera, renderer, player, keyboard;
 var remotePlayers = [];
 var localPlayers = [];
+var playerID = -1;
 var counter = 0;
+var ws;
 
 Physijs.scripts.worker = '/js/physijs_worker.js';
 Physijs.scripts.ammo = '/js/ammo.js';
@@ -46,6 +46,19 @@ function setupWebSocket() {
     };
 }
 
+function updateServerPositions() {
+    setInterval(function() {
+        ws.send(JSON.stringify({
+            "type": "position",
+            "position": {
+                x: player.position.x,
+                y: player.position.y,
+                z: player.position.z
+            }
+        }));
+    }, 20);
+}
+
 function handlePositionUpdates(positions) {
     remotePlayers = JSON.parse(positions);
 }
@@ -75,7 +88,6 @@ function getMesh(meshColor) {
 function initPlayer() {
     player = getMesh(0xDF565B);
     player.position.y = 50;
-    player.position.y = 50;
     scene.add(player);
 }
 
@@ -102,39 +114,49 @@ function addEnvironment() {
 }
 
 function updatePlayers() {
-    for (var i = 0; i < remotePlayers.length; i++) {
-        var remotePlayerID = remotePlayers[i].playerID;
-        if (remotePlayerID !== playerID && playerID !== -1) {
-            if (!knownPlayer(remotePlayerID)) {
-                showRemotePlayer(remotePlayerID);
-            } else if (knownPlayer(remotePlayerID) && remotePlayerID !== playerID) {
-                updateRemotePlayer(remotePlayerID, remotePlayers[i].position);
+    if (playerID !== -1) {
+        for (var i = 0; i < remotePlayers.length; i++) {
+            var remotePlayerID = remotePlayers[i].playerID;
+            if (remotePlayerID !== playerID) {
+                if (!knownPlayer(remotePlayerID)) {
+                    createRemotePlayer(remotePlayerID);
+                } else if (knownPlayer(remotePlayerID) && remotePlayerID !== playerID) {
+                    updateRemotePlayer(remotePlayerID, remotePlayers[i].position);
+                }
             }
         }
+        localPlayers = remotePlayers.slice(0);
     }
-    localPlayers = remotePlayers.slice(0);
 }
 
 function updateRemotePlayer(remotePlayerID, remotePlayerPosition) {
-    var newPlayer = scene.getObjectByName(remotePlayerID + "");
-    newPlayer.position.setX(remotePlayerPosition.x);
-    newPlayer.position.setY(remotePlayerPosition.y);
-    newPlayer.position.setZ(remotePlayerPosition.z);
+    var remotePlayer = scene.getObjectByName(remotePlayerID + "");
+    remotePlayer.position.setX(remotePlayerPosition.x);
+    remotePlayer.position.setY(remotePlayerPosition.y);
+    remotePlayer.position.setZ(remotePlayerPosition.z);
+    remotePlayer.rotation.set = new THREE.Vector3(0, 0, 0);
 }
 
 function knownPlayer(remotePlayerID) {
     for (var i = 0; i < localPlayers.length; i++) {
+        localPlayers[i].exist = false;
         if (localPlayers[i].playerID === remotePlayerID) {
+            localPlayers[i].exist = true;
             return true;
         }
     }
     return false;
 }
 
-function showRemotePlayer(remotePlayerID) {
-    var newPlayer = getMesh(0x28BCB3);
-    newPlayer.name = "" + remotePlayerID;
-    scene.add(newPlayer);
+function createRemotePlayer(remotePlayerID) {
+    var remotePlayer = getMesh(0x28BCB3);
+    remotePlayer.name = "" + remotePlayerID;
+    scene.add(remotePlayer);
+}
+
+function deleteRemotePlayer(remotePlayerID) {
+    var remotePlayer = scene.getObjectByName(remotePlayerID + "");
+    scene.remove(remotePlayer);
 }
 
 function keyboardEvents() {
@@ -156,6 +178,14 @@ function keyboardEvents() {
     if (keyboard.pressed("space")) {
         player.applyCentralImpulse(new THREE.Vector3(0, 600, 0));
     }
+    player.rotation.set = new THREE.Vector3(0, 0, 0);
+
+}
+
+function loop() {
+    keyboardEvents();
+    scene.simulate();
+    setTimeout(loop, 1000 / 60);
 }
 
 function render() {
@@ -165,12 +195,6 @@ function render() {
     requestAnimationFrame(render);
 }
 
-function loop() {
-    keyboardEvents();
-    scene.simulate();
-    setTimeout(loop, 1000 / 60);
-}
-
 function startGame() {
     init();
     addLight();
@@ -178,17 +202,4 @@ function startGame() {
     initPlayer();
     render();
     loop();
-}
-
-function updateServerPositions() {
-    setInterval(function() {
-        ws.send(JSON.stringify({
-            "type": "position",
-            "position": {
-                x: player.position.x,
-                y: player.position.y,
-                z: player.position.z
-            }
-        }));
-    }, 20);
 }
