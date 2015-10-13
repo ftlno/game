@@ -10,7 +10,6 @@ Physijs.scripts.ammo = '/js/ammo.js';
 
 function init() {
     setupWebSocket();
-
     keyboard = new THREEx.KeyboardState();
     scene = new Physijs.Scene;
     scene.setGravity(new THREE.Vector3(0, -230, 0));
@@ -39,6 +38,7 @@ function setupWebSocket() {
             var msg = JSON.parse(event.data);
             if (msg.type === 'ready') {
                 playerID = msg.playerID;
+                localPlayers.push(playerID);
             } else if (msg.type === 'position') {
                 handlePositionUpdates(msg.position);
             }
@@ -84,30 +84,29 @@ function addEnvironment() {
         color: 0x919191
     }), 0.8, 0.3);
 
-    var NoiseGen = new SimplexNoise;
+    var NoiseGen = new SimplexNoise();
 
-    var ground_geometry = new THREE.PlaneGeometry(300, 300, 20, 20);
+    var ground_geometry = new THREE.PlaneGeometry(500, 500, 10, 10);
     for (var i = 0; i < ground_geometry.vertices.length; i++) {
         var vertex = ground_geometry.vertices[i];
-        vertex.z = NoiseGen.noise(vertex.x / 50, vertex.y / 50) * 10;
+        vertex.z = NoiseGen.noise(vertex.x / 50, vertex.y / 50) * 5;
     }
 
     ground_geometry.computeFaceNormals();
     ground_geometry.computeVertexNormals();
-    ground = new Physijs.HeightfieldMesh(ground_geometry, ground_material, 0, 20, 20);
+    ground = new Physijs.HeightfieldMesh(ground_geometry, ground_material, 0, 10, 10);
     ground.rotation.x = Math.PI / -2;
     ground.receiveShadow = true;
     scene.add(ground);
 }
 
 function updatePlayers() {
-    if (playerID !== -1) {
-        for (var i = 0; i < remotePlayers.length; i++) {
-
-            var remotePlayerID = remotePlayers[i].playerID;
-            if (unknown(remotePlayerID)) {
+    for (var i = 0; i < remotePlayers.length; i++) {
+        var remotePlayerID = remotePlayers[i].playerID;
+        if (remotePlayerID !== playerID && playerID !== -1) {
+            if (!knownPlayer(remotePlayerID)) {
                 newRemotePlayer(remotePlayerID);
-            } else if (remotePlayerID != playerID) {
+            } else if (knownPlayer(remotePlayerID) && remotePlayerID !== playerID) {
                 var newPlayer = scene.getObjectByName(remotePlayerID + "");
                 newPlayer.position.setX(remotePlayers[i].position.x);
                 newPlayer.position.setY(remotePlayers[i].position.y);
@@ -118,16 +117,13 @@ function updatePlayers() {
     localPlayers = remotePlayers.slice(0);
 }
 
-function unknown(remotePlayerID) {
-    if (localPlayers.length > 1) {
-        return false;
-    }
+function knownPlayer(remotePlayerID) {
     for (var i = 0; i < localPlayers.length; i++) {
-        if (localPlayers[i].playerID == remotePlayerID) {
-            return false;
+        if (localPlayers[i].playerID === remotePlayerID) {
+            return true;
         }
     }
-    return true;
+    return false;
 }
 
 function newRemotePlayer(remotePlayerID) {
