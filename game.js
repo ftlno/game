@@ -11,7 +11,7 @@ Physijs.scripts.ammo = '/js/ammo.js';
 function init() {
     setupWebSocket();
     keyboard = new THREEx.KeyboardState();
-    scene = new Physijs.Scene;
+    scene = new Physijs.Scene();
     scene.setGravity(new THREE.Vector3(0, -230, 0));
     camera = new THREE.PerspectiveCamera(45, (window.innerWidth / window.innerHeight), 0.1, 10000);
     camera.position.set(0, 100, 150);
