@@ -52,7 +52,7 @@ function handlePositionUpdates(positions) {
 
 function addLight() {
     var light = new THREE.DirectionalLight(0xF5F5F5, 1);
-    light.position.set(200, 300, 100);
+    light.position.set(0, 500, 100);
     light.castShadow = true;
     scene.add(light);
 
@@ -139,22 +139,22 @@ function showRemotePlayer(remotePlayerID) {
 
 function keyboardEvents() {
     if (keyboard.pressed("left")) {
-        player.applyCentralImpulse(new THREE.Vector3(-200, 200, 0));
+        player.applyCentralImpulse(new THREE.Vector3(-200, 100, 0));
     }
     if (keyboard.pressed("right")) {
-        player.applyCentralImpulse(new THREE.Vector3(200, 200, 0));
+        player.applyCentralImpulse(new THREE.Vector3(200, 100, 0));
     }
 
     if (keyboard.pressed("up")) {
-        player.applyCentralImpulse(new THREE.Vector3(0, 200, -200));
+        player.applyCentralImpulse(new THREE.Vector3(0, 100, -200));
     }
 
     if (keyboard.pressed("down")) {
-        player.applyCentralImpulse(new THREE.Vector3(0, 200, 200));
+        player.applyCentralImpulse(new THREE.Vector3(0, 100, 200));
     }
 
     if (keyboard.pressed("space")) {
-        player.applyCentralImpulse(new THREE.Vector3(0, 750, 0));
+        player.applyCentralImpulse(new THREE.Vector3(0, 600, 0));
     }
 }
 
