@@ -31,7 +31,7 @@ function setupWebSocket() {
 
     ws.onopen = function(event) {
         console.log("WebSocket connection open");
-        startPositionUpdates();
+        updateServerPositions();
     };
     ws.onmessage = function(event) {
         if (event.data !== 'undefined') {
@@ -87,7 +87,8 @@ function addEnvironment() {
     var NoiseGen = new SimplexNoise();
 
     var ground_geometry = new THREE.PlaneGeometry(500, 500, 10, 10);
-    for (var i = 0; i < ground_geometry.vertices.length; i++) {
+    var ground_geometry_verticesLength = ground_geometry.vertices.length;
+    for (var i = 0; i < ground_geometry_verticesLength; i++) {
         var vertex = ground_geometry.vertices[i];
         vertex.z = NoiseGen.noise(vertex.x / 50, vertex.y / 50) * 5;
     }
@@ -175,7 +176,7 @@ function startGame() {
     loop();
 }
 
-function startPositionUpdates() {
+function updateServerPositions() {
     setInterval(function() {
         ws.send(JSON.stringify({
             "type": "position",
