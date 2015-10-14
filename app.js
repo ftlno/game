@@ -1,14 +1,18 @@
+//Frontend server
+var express = require('express');
+var app = express();
+var port = 8000;
+app.use('/', express.static(__dirname + '/'));
+
+//Websocket server
+var idCounter = 0;
+var players = [];
+
 var server = require('http').createServer();
 var WebSocketServer = require('ws').Server;
 var wss = new WebSocketServer({
     server: server
 });
-var express = require('express');
-var app = express();
-var port = 8000;
-app.use('/', express.static(__dirname + '/'));
-var idCounter = 0;
-var players = [];
 
 wss.on('connection', function(ws) {
     ws.playerID = idCounter++;
