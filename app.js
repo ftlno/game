@@ -34,8 +34,17 @@ wss.on('connection', function(ws) {
     });
 
     ws.on('close', function(reason) {
+        removeClient(reason);
+    });
+
+    ws.on('error', function(reason) {
+        removeClient(reason);
+    });
+
+    function removeClient(reason) {
         for (var i = 0; i < players.length; i++) {
             if (players[i] === ws) {
+                console.log('removing');
                 players.splice(i, 1);
                 for (var j = 0; j < players.length; j++) {
                     players[j].send(JSON.stringify({
@@ -46,7 +55,8 @@ wss.on('connection', function(ws) {
                 break;
             }
         }
-    });
+
+    }
 
     ws.send(JSON.stringify({
         "type": "ready",
@@ -57,6 +67,7 @@ wss.on('connection', function(ws) {
 var sendPositions = function() {
     var positions = JSON.stringify(getPlayerPositions());
     for (var i = 0; i < players.length; i++) {
+        players[i]
         players[i].send(JSON.stringify({
             "type": "position",
             "position": positions
