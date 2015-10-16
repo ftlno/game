@@ -67,11 +67,12 @@ wss.on('connection', function(ws) {
 var sendPositions = function() {
     var positions = JSON.stringify(getPlayerPositions());
     for (var i = 0; i < players.length; i++) {
-        players[i]
-        players[i].send(JSON.stringify({
-            "type": "position",
-            "position": positions
-        }));
+        if (players[i].readyState === 1) {
+            players[i].send(JSON.stringify({
+                "type": "position",
+                "position": positions
+            }));
+        }
     }
 };
 
