@@ -94,7 +94,7 @@ function initEnvironment() {
     }), 0.5, 0.5);
 
     var NoiseGen = new SimplexNoise();
-    var ground = new Physijs.BoxMesh(new THREE.BoxGeometry(50, 5, 50), material, 0);
+    var ground = new Physijs.BoxMesh(new THREE.BoxGeometry(300, 5, 300), material, 0);
     ground.receiveShadow = true;
     scene.add(ground);
 }
@@ -120,7 +120,6 @@ function updateRemotePlayer(remotePlayerID, remotePlayerPosition) {
     remotePlayer.position.setX(remotePlayerPosition.x);
     remotePlayer.position.setY(remotePlayerPosition.y);
     remotePlayer.position.setZ(remotePlayerPosition.z);
-    remotePlayer.rotation.set = new THREE.Vector3(0, 0, 0);
 }
 
 function knownPlayer(remotePlayerID) {
