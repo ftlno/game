@@ -135,10 +135,10 @@ function knownPlayer(remotePlayerID) {
 
 function setMaximumVelocity() {
     console.log()
-    if (player.getLinearVelocity().y < -400) {
+    if (player.getLinearVelocity().y < -300) {
         player.setLinearVelocity({
             x: player.getLinearVelocity().x,
-            y: -400,
+            y: -300,
             z: player.getLinearVelocity().z
         });
     }

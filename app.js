@@ -44,7 +44,6 @@ wss.on('connection', function(ws) {
     function removeClient(reason) {
         for (var i = 0; i < players.length; i++) {
             if (players[i] === ws) {
-                console.log('removing');
                 players.splice(i, 1);
                 for (var j = 0; j < players.length; j++) {
                     players[j].send(JSON.stringify({
