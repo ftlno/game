@@ -24,13 +24,12 @@ function init() {
 }
 
 function setupWebSocket() {
-    ws = new WebSocket('ws://10.0.20.9:8000');
+    ws = new WebSocket('ws://localhost:8000');
 
     ws.onopen = function(event) {
         console.log("WebSocket connection open");
         updateServerPositions();
     };
-    
     ws.onmessage = function(event) {
         if (event.data !== 'undefined') {
             var msg = JSON.parse(event.data);
