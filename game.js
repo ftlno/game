@@ -73,9 +73,9 @@ function initLight() {
 
 function getMesh(meshColor) {
     var geometry = new THREE.BoxGeometry(5, 5, 5);
-    var material = new Physijs.createMaterial(new THREE.MeshPhongMaterial({
+    var material = new Physijs.createMaterial(new THREE.MeshLambertMaterial({
         color: meshColor
-    }), 0.9, 0.9);
+    }), 0.8, 0.2);
 
     var mesh = new Physijs.BoxMesh(geometry, material, 100);
     mesh.castShadow = true;
@@ -89,22 +89,12 @@ function initPlayer() {
 }
 
 function initEnvironment() {
-    var material = new Physijs.createMaterial(new THREE.MeshPhongMaterial({
+    var material = new Physijs.createMaterial(new THREE.MeshLambertMaterial({
         color: 0x919191
-    }), 0.8, 0.3);
+    }), 0.5, 0.5);
 
     var NoiseGen = new SimplexNoise();
-    var geometry = new THREE.PlaneGeometry(500, 500, 10, 10);
-    var geometry_verticesLength = geometry.vertices.length;
-    for (var i = 0; i < geometry_verticesLength; i++) {
-        var vertex = geometry.vertices[i];
-        vertex.z = NoiseGen.noise(vertex.x / 50, vertex.y / 50) * 5;
-    }
-
-    geometry.computeFaceNormals();
-    geometry.computeVertexNormals();
-    var ground = new Physijs.HeightfieldMesh(geometry, material, 0, 10, 10);
-    ground.rotation.x = Math.PI / -2;
+    var ground = new Physijs.BoxMesh(new THREE.BoxGeometry(50, 5, 50), material, 0);
     ground.receiveShadow = true;
     scene.add(ground);
 }
@@ -144,6 +134,17 @@ function knownPlayer(remotePlayerID) {
     return false;
 }
 
+function setMaximumVelocity() {
+    console.log()
+    if (player.getLinearVelocity().y < -400) {
+        player.setLinearVelocity({
+            x: player.getLinearVelocity().x,
+            y: -400,
+            z: player.getLinearVelocity().z
+        });
+    }
+}
+
 function createRemotePlayer(remotePlayerID) {
     var remotePlayer = getMesh(0x28BCB3);
     remotePlayer.name = "" + remotePlayerID;
@@ -179,6 +180,7 @@ function keyboardEvents() {
 
 function loop() {
     keyboardEvents();
+    setMaximumVelocity();
     scene.simulate();
     setTimeout(loop, 1000 / 60);
 }
