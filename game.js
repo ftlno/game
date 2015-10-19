@@ -15,7 +15,7 @@ function init() {
     scene = new Physijs.Scene();
     scene.setGravity(new THREE.Vector3(0, -230, 0));
     camera = new THREE.PerspectiveCamera(45, (window.innerWidth / window.innerHeight), 0.1, 10000);
-    camera.position.set(0, 70, 150);
+    camera.position.set(0, 70, 200);
     scene.add(camera);
     renderer = new THREE.WebGLRenderer();
     renderer.setClearColor(new THREE.Color(0xDBDBDB));
@@ -95,8 +95,6 @@ function initEnvironment() {
     ground.receiveShadow = true;
     scene.add(ground);
 }
-
-function getWall() {}
 
 function getMaterial(color) {
     return new Physijs.createMaterial(new THREE.MeshLambertMaterial({
