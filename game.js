@@ -24,6 +24,9 @@ function init() {
     renderer.shadowMapSoft = true;
     renderer.shadowMapType = THREE.PCFSoftShadowMap;
     document.body.appendChild(renderer.domElement);
+    initEnvironment();
+    initLight();
+    initPlayer();
 }
 
 function setupWebSocket() {
@@ -173,14 +176,14 @@ function keyboardEvents() {
     }
 
     if (keyboard.pressed("down")) {
-       newDirection = new THREE.Vector3(0, 100, 200);
+        newDirection = new THREE.Vector3(0, 100, 200);
     }
 
     if (keyboard.pressed("space")) {
         player.applyCentralImpulse(new THREE.Vector3(0, 600, 0));
     }
 
-    if(newDirection !== undefined){
+    if (newDirection !== undefined) {
         player.applyCentralImpulse(newDirection.applyQuaternion(camera.quaternion));
     }
 }
@@ -201,9 +204,6 @@ function render() {
 
 function startGame() {
     init();
-    initEnvironment();
-    initLight();
-    initPlayer();
-    render();
     loop();
+    render();
 }
