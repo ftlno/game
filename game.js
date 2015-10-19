@@ -74,10 +74,7 @@ function initLight() {
 
 function getMesh(meshColor) {
     var geometry = new THREE.BoxGeometry(5, 5, 5);
-    var material = new Physijs.createMaterial(new THREE.MeshLambertMaterial({
-        color: meshColor
-    }), 0.8, 0.2);
-
+    var material = getMaterial(meshColor);
     var mesh = new Physijs.BoxMesh(geometry, material, 100);
     mesh.castShadow = true;
     return mesh;
@@ -88,19 +85,20 @@ function initPlayer() {
     player.position.y = 50;
     player.add(camera);
     camera.position.set(100, 30, 0);
-    camera.lookAt(new THREE.Vector3(0, 0, 0));
-
     scene.add(player);
 }
 
 function initEnvironment() {
-    var material = new Physijs.createMaterial(new THREE.MeshLambertMaterial({
-        color: 0x919191
-    }), 0.5, 0.5);
-
+    var material = getMaterial(0x919191);
     var ground = new Physijs.BoxMesh(new THREE.BoxGeometry(10000, 5, 10000), material, 0);
     ground.receiveShadow = true;
     scene.add(ground);
+}
+
+function getMaterial(color){
+    return new Physijs.createMaterial(new THREE.MeshLambertMaterial({
+        color: color
+    }), 0.8, 0.3);
 }
 
 function updatePlayers() {
@@ -182,6 +180,7 @@ function keyboardEvents() {
 }
 
 function loop() {
+    camera.lookAt(new THREE.Vector3(0, -1, 0));
     keyboardEvents();
     setMaximumVelocity();
     scene.simulate();
