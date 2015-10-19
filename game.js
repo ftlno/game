@@ -86,9 +86,16 @@ function getMesh(meshColor) {
     return mesh;
 }
 
+function initPlayerLabel() {
+    var label = new THREE.Mesh(new THREE.BoxGeometry(30, 10, 1), createTextMaterial("Fredrik"));
+    player.add(label);
+    label.position.y = 10;
+}
+
 function initPlayer() {
     player = getMesh(0xDF565B);
     player.position.y = 50;
+    initPlayerLabel();
     scene.add(player);
 }
 
@@ -103,6 +110,23 @@ function getMaterial(color) {
     return new Physijs.createMaterial(new THREE.MeshLambertMaterial({
         color: color
     }), 0.8, 0.3);
+}
+
+function createTextMaterial(text) {
+    var canvas = document.createElement('canvas');
+    canvas.width = 500;
+    canvas.height = 500;
+    var context = canvas.getContext('2d');
+    context.font = "Bold 100px Helvetica";
+    context.fillStyle = "rgba(255,255,255,1)";
+    context.fillText(text, 0, 400);
+    var texture = new THREE.Texture(canvas)
+    texture.needsUpdate = true;
+
+    return new THREE.MeshBasicMaterial({
+        map: texture,
+        side: THREE.SingleSide
+    });
 }
 
 function updatePlayers() {
