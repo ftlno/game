@@ -3,6 +3,7 @@ var remotePlayers = [];
 var localPlayers = [];
 var playerID = -1;
 var ws;
+var server_url = 'ws://localhost:8000';
 
 Physijs.scripts.worker = '/js/physijs_worker.js';
 Physijs.scripts.ammo = '/js/ammo.js';
@@ -28,7 +29,7 @@ function init() {
 }
 
 function setupWebSocket() {
-    ws = new WebSocket('ws://localhost:8000');
+    ws = new WebSocket(server_url);
 
     ws.onopen = function(event) {
         console.log("WebSocket connection open");
