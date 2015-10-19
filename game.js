@@ -1,4 +1,5 @@
 var scene, camera, renderer, player, keyboard;
+var relativeCameraOffset, cameraOffset;
 var remotePlayers = [];
 var localPlayers = [];
 var playerID = -1;
@@ -14,6 +15,8 @@ function init() {
     scene = new Physijs.Scene();
     scene.setGravity(new THREE.Vector3(0, -230, 0));
     camera = new THREE.PerspectiveCamera(45, (window.innerWidth / window.innerHeight), 0.1, 10000);
+    camera.position.set(0, 70, 150);
+    scene.add(camera);
     renderer = new THREE.WebGLRenderer();
     renderer.setClearColor(new THREE.Color(0xDBDBDB));
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -83,8 +86,6 @@ function getMesh(meshColor) {
 function initPlayer() {
     player = getMesh(0xDF565B);
     player.position.y = 50;
-    player.add(camera);
-    camera.position.set(100, 30, 0);
     scene.add(player);
 }
 
@@ -95,7 +96,9 @@ function initEnvironment() {
     scene.add(ground);
 }
 
-function getMaterial(color){
+function getWall() {}
+
+function getMaterial(color) {
     return new Physijs.createMaterial(new THREE.MeshLambertMaterial({
         color: color
     }), 0.8, 0.3);
@@ -158,29 +161,34 @@ function deleteRemotePlayer(remotePlayerID) {
 }
 
 function keyboardEvents() {
+    var newDirection = undefined;
     if (keyboard.pressed("left")) {
-        player.applyCentralImpulse(new THREE.Vector3(-200, 100, 0));
+        newDirection = new THREE.Vector3(-200, 100, 0);
     }
 
     if (keyboard.pressed("right")) {
-        player.applyCentralImpulse(new THREE.Vector3(200, 100, 0));
+        newDirection = new THREE.Vector3(200, 100, 0);
     }
 
     if (keyboard.pressed("up")) {
-        player.applyCentralImpulse(new THREE.Vector3(0, 100, -200));
+        newDirection = new THREE.Vector3(0, 100, -200);
     }
 
     if (keyboard.pressed("down")) {
-        player.applyCentralImpulse(new THREE.Vector3(0, 100, 200));
+       newDirection = new THREE.Vector3(0, 100, 200);
     }
 
     if (keyboard.pressed("space")) {
         player.applyCentralImpulse(new THREE.Vector3(0, 600, 0));
     }
+
+    if(newDirection !== undefined){
+        player.applyCentralImpulse(newDirection.applyQuaternion(camera.quaternion));
+    }
 }
 
 function loop() {
-    camera.lookAt(new THREE.Vector3(0, -1, 0));
+    camera.lookAt(player.position);
     keyboardEvents();
     setMaximumVelocity();
     scene.simulate();
