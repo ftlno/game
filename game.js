@@ -93,8 +93,7 @@ function initEnvironment() {
         color: 0x919191
     }), 0.5, 0.5);
 
-    var NoiseGen = new SimplexNoise();
-    var ground = new Physijs.BoxMesh(new THREE.BoxGeometry(300, 5, 300), material, 0);
+    var ground = new Physijs.BoxMesh(new THREE.BoxGeometry(10000, 5, 10000), material, 0);
     ground.receiveShadow = true;
     scene.add(ground);
 }
