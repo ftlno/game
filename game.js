@@ -14,12 +14,12 @@ function init() {
     scene = new Physijs.Scene();
     scene.setGravity(new THREE.Vector3(0, -230, 0));
     camera = new THREE.PerspectiveCamera(45, (window.innerWidth / window.innerHeight), 0.1, 10000);
-    camera.position.set(0, 100, 150);
     renderer = new THREE.WebGLRenderer();
     renderer.setClearColor(new THREE.Color(0xDBDBDB));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.shadowMap.enabled = true;
     renderer.shadowMapSoft = true;
+    renderer.shadowMapType = THREE.PCFSoftShadowMap;
     document.body.appendChild(renderer.domElement);
 }
 
@@ -66,6 +66,7 @@ function initLight() {
     var light = new THREE.DirectionalLight(0xF5F5F5, 1);
     light.position.set(0, 500, 100);
     light.castShadow = true;
+    light.shadowDarkness = 0.5;
     scene.add(light);
     var ambLight = new THREE.AmbientLight(0x0505050);
     scene.add(ambLight);
@@ -85,6 +86,10 @@ function getMesh(meshColor) {
 function initPlayer() {
     player = getMesh(0xDF565B);
     player.position.y = 50;
+    player.add(camera);
+    camera.position.set(100, 30, 0);
+    camera.lookAt(new THREE.Vector3(0, 0, 0));
+
     scene.add(player);
 }
 
@@ -185,7 +190,6 @@ function loop() {
 
 function render() {
     updatePlayers();
-    camera.lookAt(player.position);
     renderer.render(scene, camera);
     requestAnimationFrame(render);
 }
