@@ -1,9 +1,7 @@
 var scene, camera, renderer, player, keyboard;
-var relativeCameraOffset, cameraOffset;
 var remotePlayers = [];
 var localPlayers = [];
 var playerID = -1;
-var counter = 0;
 var ws;
 
 Physijs.scripts.worker = '/js/physijs_worker.js';
@@ -23,10 +21,10 @@ function init() {
     renderer.shadowMap.enabled = true;
     renderer.shadowMapSoft = true;
     renderer.shadowMapType = THREE.PCFSoftShadowMap;
-    document.body.appendChild(renderer.domElement);
     initEnvironment();
     initLight();
     initPlayer();
+    document.body.appendChild(renderer.domElement);
 }
 
 function setupWebSocket() {
@@ -74,8 +72,7 @@ function initLight() {
     light.castShadow = true;
     light.shadowDarkness = 0.5;
     scene.add(light);
-    var ambLight = new THREE.AmbientLight(0x0505050);
-    scene.add(ambLight);
+    scene.add(new THREE.AmbientLight(0x0505050));
 }
 
 function getMesh(meshColor) {
@@ -123,9 +120,7 @@ function updatePlayers() {
 
 function updateRemotePlayer(remotePlayerID, remotePlayerPosition) {
     var remotePlayer = scene.getObjectByName(remotePlayerID + "");
-    remotePlayer.position.setX(remotePlayerPosition.x);
-    remotePlayer.position.setY(remotePlayerPosition.y);
-    remotePlayer.position.setZ(remotePlayerPosition.z);
+    remotePlayer.position.set(remotePlayerPosition.x, remotePlayerPosition.y, remotePlayerPosition.z);
 }
 
 function knownPlayer(remotePlayerID) {
@@ -140,7 +135,6 @@ function knownPlayer(remotePlayerID) {
 }
 
 function setMaximumVelocity() {
-    console.log()
     if (player.getLinearVelocity().y < -300) {
         player.setLinearVelocity({
             x: player.getLinearVelocity().x,
@@ -166,23 +160,18 @@ function keyboardEvents() {
     if (keyboard.pressed("left")) {
         newDirection = new THREE.Vector3(-200, 100, 0);
     }
-
     if (keyboard.pressed("right")) {
         newDirection = new THREE.Vector3(200, 100, 0);
     }
-
     if (keyboard.pressed("up")) {
         newDirection = new THREE.Vector3(0, 100, -200);
     }
-
     if (keyboard.pressed("down")) {
         newDirection = new THREE.Vector3(0, 100, 200);
     }
-
     if (keyboard.pressed("space")) {
         player.applyCentralImpulse(new THREE.Vector3(0, 600, 0));
     }
-
     if (newDirection !== undefined) {
         player.applyCentralImpulse(newDirection.applyQuaternion(camera.quaternion));
     }
