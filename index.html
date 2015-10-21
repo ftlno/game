@@ -7,6 +7,7 @@
     <link rel="stylesheet" type="text/css" href="css/style.css">
     <script src="js/three.min.js"></script>
     <script src='js/THREEx.KeyboardState.js'></script>
+    <script src='js/virtualjoystick.js'></script>
     <script src="js/physi.js"></script>
     <script src="game.js"></script>
 </head>
@@ -16,9 +17,11 @@
         <img id="bekk_logo" src="css/bekk_logo.png" width="80px" height="auto" alt="BEKK logo">
         <span id="app_name">Coexist</span>
     </div>
-    <script>
-    window.onload = startGame();
-    </script>
+    <div id="container">
+        <script>
+        window.onload = initGame();
+        </script>
+    </div>
 </body>
 
 </html>

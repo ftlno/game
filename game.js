@@ -1,34 +1,15 @@
-var scene, camera, renderer, player, keyboard;
+var scene, camera, renderer, player, keyboard, steering, gassPedal;
 var remotePlayers = [];
 var localPlayers = [];
 var playerID = -1;
+var moveForce = 250;
 var ws;
-var server_url = 'ws://localhost:8000';
+var server_url = 'ws://172.20.10.5:8000';
 
 Physijs.scripts.worker = '/js/physijs_worker.js';
 Physijs.scripts.ammo = '/js/ammo.js';
 
-function init() {
-    setupWebSocket();
-    keyboard = new THREEx.KeyboardState();
-    scene = new Physijs.Scene();
-    scene.setGravity(new THREE.Vector3(0, -230, 0));
-    camera = new THREE.PerspectiveCamera(45, (window.innerWidth / window.innerHeight), 0.1, 10000);
-    camera.position.set(0, 70, 200);
-    scene.add(camera);
-    renderer = new THREE.WebGLRenderer();
-    renderer.setClearColor(new THREE.Color(0xDBDBDB));
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMapSoft = true;
-    renderer.shadowMapType = THREE.PCFSoftShadowMap;
-    initEnvironment();
-    initLight();
-    initPlayer();
-    document.body.appendChild(renderer.domElement);
-}
-
-function setupWebSocket() {
+function initWebSocket() {
     ws = new WebSocket(server_url);
 
     ws.onopen = function(event) {
@@ -67,6 +48,21 @@ function handlePositionUpdates(positions) {
     remotePlayers = JSON.parse(positions);
 }
 
+function initSceneCameraRenderer() {
+    scene = new Physijs.Scene();
+    scene.setGravity(new THREE.Vector3(0, -230, 0));
+    camera = new THREE.PerspectiveCamera(45, (window.innerWidth / window.innerHeight), 0.1, 10000);
+    camera.position.set(0, 70, 200);
+    scene.add(camera);
+    renderer = new THREE.WebGLRenderer();
+    renderer.setClearColor(new THREE.Color(0xDBDBDB));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMapSoft = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    document.getElementById('container').appendChild(renderer.domElement);
+}
+
 function initLight() {
     var light = new THREE.DirectionalLight(0xF5F5F5, 1);
     light.position.set(0, 500, 100);
@@ -76,12 +72,31 @@ function initLight() {
     scene.add(new THREE.AmbientLight(0x0505050));
 }
 
-function getMesh(meshColor) {
-    var geometry = new THREE.BoxGeometry(5, 5, 5);
-    var material = getMaterial(meshColor);
-    var mesh = new Physijs.BoxMesh(geometry, material, 100);
-    mesh.castShadow = true;
-    return mesh;
+function initKeyboardAndJoysticks() {
+    keyboard = new THREEx.KeyboardState();
+    steering = new VirtualJoystick({
+        container: document.getElementById('container'),
+        strokeStyle: '#333333',
+        limitStickTravel: true,
+        stickRadius: 50,
+        mouseSupport: true
+    });
+
+    steering.addEventListener('touchStartValidation', function(event) {
+        return (event.changedTouches[0].pageX < window.innerWidth / 2);
+    });
+
+    gassPedal = new VirtualJoystick({
+        container: document.getElementById('container'),
+        strokeStyle: '#333333',
+        limitStickTravel: true,
+        stickRadius: 50,
+        mouseSupport: true
+    });
+
+    gassPedal.addEventListener('touchStartValidation', function(event) {
+        return (event.changedTouches[0].pageX > window.innerWidth / 2);
+    });
 }
 
 function initPlayer() {
@@ -92,9 +107,17 @@ function initPlayer() {
 
 function initEnvironment() {
     var material = getMaterial(0x919191);
-    var ground = new Physijs.BoxMesh(new THREE.BoxGeometry(10000, 5, 10000), material, 0);
+    var ground = new Physijs.BoxMesh(new THREE.BoxGeometry(500, 5, 500), material, 0);
     ground.receiveShadow = true;
     scene.add(ground);
+}
+
+function getMesh(meshColor) {
+    var geometry = new THREE.BoxGeometry(5, 5, 5);
+    var material = getMaterial(meshColor);
+    var mesh = new Physijs.BoxMesh(geometry, material, 100);
+    mesh.castShadow = true;
+    return mesh;
 }
 
 function getMaterial(color) {
@@ -156,31 +179,32 @@ function deleteRemotePlayer(remotePlayerID) {
     scene.remove(remotePlayer);
 }
 
-function keyboardEvents() {
-    var newDirection = undefined;
-    if (keyboard.pressed("left")) {
-        newDirection = new THREE.Vector3(-200, 100, 0);
+function handleJoystickAndKeyboardEvents() {
+    var force;
+    if (keyboard.pressed("left") || steering.left()) {
+        force = new THREE.Vector3(-moveForce, 100, 0);
     }
-    if (keyboard.pressed("right")) {
-        newDirection = new THREE.Vector3(200, 100, 0);
+    if (keyboard.pressed("right") || steering.right()) {
+        force = new THREE.Vector3(moveForce, 100, 0);
     }
-    if (keyboard.pressed("up")) {
-        newDirection = new THREE.Vector3(0, 100, -200);
+    if (keyboard.pressed("up") || steering.up()) {
+        force = new THREE.Vector3(0, 100, -moveForce);
     }
-    if (keyboard.pressed("down")) {
-        newDirection = new THREE.Vector3(0, 100, 200);
+    if (keyboard.pressed("down") || steering.down()) {
+        force = new THREE.Vector3(0, 100, moveForce);
     }
-    if (keyboard.pressed("space")) {
+
+    if (keyboard.pressed("space") || gassPedal.up()) {
         player.applyCentralImpulse(new THREE.Vector3(0, 600, 0));
     }
-    if (newDirection !== undefined) {
-        player.applyCentralImpulse(newDirection.applyQuaternion(camera.quaternion));
+    if (force !== undefined) {
+        player.applyCentralImpulse(force.applyQuaternion(camera.quaternion));
     }
 }
 
 function loop() {
     camera.lookAt(player.position);
-    keyboardEvents();
+    handleJoystickAndKeyboardEvents();
     setMaximumVelocity();
     scene.simulate();
     setTimeout(loop, 1000 / 60);
@@ -192,8 +216,17 @@ function render() {
     requestAnimationFrame(render);
 }
 
+function initGame() {
+    initWebSocket();
+    initSceneCameraRenderer();
+    initEnvironment();
+    initLight();
+    initPlayer();
+    initKeyboardAndJoysticks();
+    startGame();
+}
+
 function startGame() {
-    init();
     loop();
     render();
 }
