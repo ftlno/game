@@ -4,7 +4,7 @@ var localPlayers = [];
 var playerID = -1;
 var moveForce = 250;
 var ws;
-var server_url = 'ws://172.20.10.5:8000';
+var server_url = 'ws://localhost:8000';
 
 Physijs.scripts.worker = '/js/physijs_worker.js';
 Physijs.scripts.ammo = '/js/ammo.js';
